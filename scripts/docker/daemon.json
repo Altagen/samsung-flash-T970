@@ -1,0 +1,10 @@
+{
+  "data-root": "/data/docker",
+  "storage-driver": "overlay2",
+  "iptables": false,
+  "ip-forward": true,
+  "ip-masq": false,
+  "bridge": "none",
+  "dns": ["8.8.8.8", "1.1.1.1"],
+  "log-level": "info"
+}

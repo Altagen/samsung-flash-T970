@@ -1,0 +1,293 @@
+Thème général : moderne professionnel coloré et qui tire partie des meilleurs design web 2026
+Quand je dis que quelque chose "apparaît" généralement je parle d'une animation "au clic"
+Il vaut mieux imager quelque chose que l'écrire, si c'est nécessaire de l'écrire on essaie soit de le mettre dans un schéma soit méthodiquement à un endroit ou l'on sait que ce sera logique pour qu'on n'ait besoin que du mot.
+
+a chaque fois, on se débrouille pour que le sujet de dont on parle, soit mis en avant par rapport aux autres (donc si on a des choses à l'écran et qu'on veut afficher autre chose, on fait disparaître l'élément précédent) Si c'est une comparaison ou une mise en contexte, on affiche dans le même écran, et si juste on a des éléments d'énumération on les faits apparaître les uns après les autres, et au pire je reformulerai par slide si c'est pas suivi exactement à la lettre.
+
+On essaie de faire en sorte que ce soit hyper visuel et animé quand c'est possible, ça parle beaucoup plus que des diagrammes en 2d un peu moches
+
+
+Slide 1  présentation :
+
+Titre de la présentation :  "Warranty Void" qui apparaît avec un background un peu mystérieux et animé.
+
+Sous texte "des conteneurs sur une tablette ?"
+Pied de présentation : Ange Cesari, 7 Mai 2026 - Mesh Union
+
+
+Slide 2 Hook :
+
+Rien au début, juste le fond, arrive de nul part deux lignes ultra visible avec la même couleur, rien pour les distinguer
+
+Puis une animation pour mettre l'octet incriminé avec la couleur et le faire ressortir.
+
+à la prochaine animation, une liste qui apparaît au fur et à mesure :
+- Boot sur Android
+- Isolation des processus
+- SELinux
+- Patcher un kernel
+
+Phrase de sous texte qui apparaît tout en bas "Tout ça parce-que je voulais faire tourner des conteneurs sur une tablette"
+
+Slide 3
+
+Une photo d'une tablette (Galaxy tab s7+ super jolie) et je veux qu'on montre un schéma design de quelqu'un qui se connecte en VPN à son infra locale + qui utilise VNC (si possible avec les trames réseaux qu'on voit passer) mais qu'on marque comme nom pour expliquer qu'on ne veut pas faire ça mais qu'on veut du natif. (un côté la tablette avec les specs, à gauche) et à droite, ce qu'on pourrait avoir pour dev proprement sur la tablette mais qu'on ne veut pas car trop contraignant de vpn+vnc.
+
+
+ Slide 4
+
+ On passe de la figure avec la complexité du VPN, infra locale à distance etc à juste, on fait tourner des conteneurs sur la tablette (si c'est possible d'animer proprement + schéma, on voit l'infra qui rentre dans la tablette pour donner quelque chose de super simple) et on voit des conteneurs dans al tablette
+
+ + apparaît
+ Des "faux" articles de blog qui disent que le kernel n'a pas les flags pour lancer par défaut des conteneurs sur la galaxy tab s7+ (ou si tu trouves les vrais ce serait super de les avoir)
+
+ + apparaît
+ Petit schéma design sur ce qu'est un kernel (et la passerelle avec le reste du système)
+
+
+  Slide 5
+
+  Montrer l'obligation d'avoir ces kernels pour démarrer un kernel (sans ça, pas possible)
+
+  + apparaît un schéma pour montrer qu'il faut modifier les flags puis compiler puis flasher.
+
+
+
+  Slide 6
+
+  les stats de la tablette avec de jolis visuels pour expliquer l'environnement de build. Le mieux serait de montrer un pc dans lequel on a un conteneur, et dans lequel on a clang etc, ça permet d'avoir quelque chose de visuel et pas juste une liste.
+
+
+  Slide 7
+
+  Fond d'écran, au clic on montre les flags et on met une tablette avec un point d'intérogation pour dire "Mais ou on met les flags?"
+
+  Transition -> On build le kernel et il est disponible.
+
+
+  Slide 8
+  Dévérouillage OEM
+
+  Il faut montrer Le Bootloader (la chaine de boot) Expliquer avec le schéma pourquoi il faut dévérouiller OEM (pour permettre d'injecter des fichiers ou des paramètres dans la séquence de boot) et permettre de changer le comportement.
+
+  Ensuite, on montre qu'un dévérouillage OEM ça fait passer la variable WARRANTY_VOID de la valeur de 0x0 à 0x1 en rouge, et on fait un rappel à la slide 2.
+
+
+
+
+
+  Slide 9
+
+  On présente ce qu'il y a dans le boot.img (on fait un joli schéma)
+  présentation du plan "remplace le kernel, reflasher"
+
+  conséquences du premier flash, on rajoute le cmd_line "force_nom_boot=1" et conséquences à nouveau : bootloop.
+
+
+  Slide 10
+
+
+  Tablette redémarrée en boucle : on introduit les mots pstore (ramoops) on montre une "zone mémoire" pour survivre aux redémarrages. lisibles au prochain boot (on fait un joli schéma design pour montrer l'architecture)
+
+  Explication du workflow  (flash kernel custom, crash, reflash stock + lecture des logs sur Android)
+
+-> Image de plein de fois ou j'ai du prendre en capture d'écran avec l'OCR pour expliquer mon problème.
+
+Ensuite, on fait propre (on revient sur une slide propre) et on voit marqué :
+
+init: ReadFstabFromDt(): failed to read fstab from dt
+init: execv("/system/bin/init") failed: No such file or directory
+Kernel panic - not syncing: Attempted to kill init!
+
+
+On met un petit schéma design de : init — c'est le tout premier programme qui se lance après le kernel, celui qui va monter les partitions et démarrer Android — il cherche son fichier de configuration des partitions (qu'on appelle le fstab), il le trouve pas, du coup il monte rien, il essaie de lancer la deuxième étape d'Android, le binaire n'existe pas parce que rien n'est monté, kernel panic.
+
+Slide 11 (bonus, ajoutée pendant la réalisation)
+
+Mosaïque des 16 photos de l'écran prises pour l'OCR d'un seul log.
+
+
+Slide 12
+
+Schéma design de ce qu'est un device tree, et de l'overlay de ce que rajoute samsung, DTBO. Une icone de fichier (avec l'annotation "Makefile" dessous) et on barre "compilation Device Trees" Pour expliquer qu'ils étaient absents
+
+On montre un nouveau cycle, dans lequel cette fois, la tablette a le log "Harware name: Samsung GTS7XL"
+
+On montre un nouveau cycle ou on a besoin du __symbols__, on enrichi le fstab et le Device tree, on montre un bootloop et on passe à la slide suivante.
+
+
+Slide 13
+
+Au bout de plusieurs loop, on active un loglevel=5 dans la conf du kernel et ça donne
+```
+init: Switching root to '/first_stage_ramdisk'
+``` à montrer
+
+Ensuite on refait un joli diagramme :
+
+
+ init crée un nouveau système de fichiers temporaire — vide — et il déplace dedans, il fait un changement de racine. Tout ce qui était disponible avant, dont mon ramdisk avec mon fstab dedans, devient inaccessible.
+
+On met en exergue que `force_normal_boot=1`  a fait un changement de racine au mauvais endroit et qui n'est pas légitime.
+
+
+
+
+Ensutie on montre que ce flag, normalement c'est le Bootloader qui l'injecte dynamiquement au boot (si possible une petite animation)
+On montre l'init qui sait gérer ce cas.
+
+La solution : Retirer le flag.
+
+
+
+Slide 14
+
+Animation ou l'on flash sans le flag, les partitions montées avec le bon changement de racine à animer :
+Partitions montées (qui apparaissent au clic `metadata` `system`, `vendor`, `product`, `odm`. )
+
+Puis le log qui apparaît :
+
+```
+init second stage started!
+```
+
+On stop et on a :
+
+```
+enablefilecrypto failed
+```
+
+
+Puis on met l'image du  menu "Retry / Factory Reset".
+
+
+Slide 15
+
+On remonte au début de la présentation et on remontre les deux octets.
+
+Là on explique visuellement (toujorus design) la partie chiffrement, KeyMaster, Root of Trust, dévérouillage OEM qui fait incrémenter la ROT de 06 à + 0x1 => 0x7 la nouvelle ROT.
+
+
+Slide 16 :
+
+La solution : Reset factory
+
+-> On perd tout ✨ et c'est ok ✨
+
+Regénération de la clé depuis une ROT qui contient l'octet d'incrémentation => 07
+
+On a :
+
+Android Boot
+Kernel Custom Ok
+Tablette Apparait en USB en mode MTP
+pas de crash
+enablefilecrypto ok
+
+Tout est vert, tout est génial et un gros tempon rouge "SAUF QUE..."
+
+L'écran reste noir. (en gros)
+
+
+Alors que pourtant on a :
+
+- ABL affiche bien l'écran,
+- le logo samsung,
+- warning bootloader dévérouillé
+
+
+mais dès qu'on boot sur Android, plus rien. On doit gérer un problème d'affichage ?
+
+
+Slide 17
+
+Montrer la logique de la poule et de l'oeuf : pour avoir adb et récupérer les logs avec logcat et dmesg, il faut avoir l'écran pour activer le mode debugging, et comme on voit rien on peut pas l'activer, du coup il faut  trouver comment faire.
+
+
+Slide 18
+
+Schéma design expliquant la partition Recovery (mini système etc)
+Expliquer le plan par étape : patcher le ramdisk, booter en recovery, obtenir un shell.
+
+On explique ensuite l'histoire du default prop, le prop default qui sert à rien, le adb devices etc puis on finit la slide sur le adb shell qui fait crash la tablette.
+
+
+Slide 19
+
+
+SELinux en gros avec un air un peu malveillant.
+
+On explique ce qu'est rapidement SElinux avec un schéma pour expliquer qu'il doit enforce sur un domain etc, et on schématise ce qui est écrit dans cette slide, on énumère les différentes tentatives (pas oblié de tout détailler mais au moins donner ce qu'on fait + les résultats des tests)
+
+On termine la slide sur "Bon... Et si on changeait d'approche ?"
+
+
+Slide 20
+
+schématiser en montrant un fichier sepolicy et en montrant avec une fleche qu'on va changer les politiques à l'intérieur du fichier pour bypass.
+
+On explique ce qu'est rapidement magiskpolicy (pas besoin d'expliquer que je l'avais depuis le début) on explique la commande à taper dans l'outil et on explique juste où on doit lancer magiskpolicy (dans quel fichier / dans quel environnement)
+
+On montre que la commande setup le domaine adb en mode permissive, on montre qu'on flash la tablette et qu'on a un shell  et qu'on peut pull les logs.
+
+
+Slide 21 :
+
+On montre qu'on peut pull les logs avec kernel custom (donc pas besoin de reflasher le kernel stock)
+
+On explique dans l'OCR les différents types de logs qu'on pensait trouver et qu'on trouve pas, on montre les fichiers qu'on lit mais qui au final ne montrent rien, et on se dit que "Le kernel n'est pas le coupable..."
+
+Slide 22 :
+On explique qu'on repasse en kernel stock pour récupérer l'écran avec le bon boot img, on explique l'installation de TWRP, la désactivation de la vérification de signature des partitions, on explique ce qu'est VBMeta avec un joli schéma design avec le bon flag.
+
+On explique Shell en recovery avec magisk (on suit ce qui est dit dans la presentation et on rend graphique ce qui est écrit)
+
+
+
+Slide 23 :
+
+Emphase sur un log "getevent"
+
+Et sur l'évènement qui fait que toggle :
+
+```
+SW_MACHINE_COVER     1
+SW_MACHINE_COVER     0
+```
+
+
+
+
+On parle du capteur magnétique, de la coque officielle samsung etc, on anime un maximum et on rend le plus graphique possible, on essaie de faire une petite charte graphique d'une tablette et d'un stylet sur le côté et quand il rentre dedans et que la cover se close, l'écran est éteint.
+
+Ensuite on passe sur la partie Logcat, on regarde les évent Wakeup, on explique qu'on pourrait patcher mais que c'est dans le jar donc compliqué, du coup on désactive juste les paramètres pour fix le bug.
+
+
+Slide 24 :
+
+On considère que c'est bon : Boot img flashé avec kernel maison et recovery, on a adb et root, android est stable, et l on commence à parrler des conteneurs, on explique proot, ptrace dans termux, les interruptions avec des s chémas, on explique les différentes portes fermées au fur et à mesure et on anime tout.
+
+Slide 25 :
+
+
+On explique qu'o na vu un article de blog de quelqu'un qui ait ça sans chroot et sans proot, on explique les avantages (plus de pb de vfs, de fscrypt, d'interruptions et de lenteurs, pas de changement de racine...)
+
+On explique qu'on rajoute quand même les fichiers manquants pour faire croire à un vrai système linux posix, on lance l'image et on met en gros le log qui dit qu'on a un Hello From docker.
+
+Et là on part sur le best effort pour faire tourner à la fois le chroot ET le docker pour permettre d'avoir la passerelle (le socket) entre les deux ET on montre qu'on est bien capable d'appeler docker depuis le chroot.
+
+Slide 26
+
+Enfin, dernière slide de wrap-up on explique rapidement ce qu'on a réussi à faire et on remercie tout le monde
+
+
+
+
+
+
+
+
+
+
+
+

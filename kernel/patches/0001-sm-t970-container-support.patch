@@ -1,0 +1,299 @@
+diff --git a/Makefile b/Makefile
+index bb5cedf04..9940123ed 100644
+--- a/Makefile
++++ b/Makefile
+@@ -446,7 +446,7 @@ LINUXINCLUDE    := \
+ KBUILD_AFLAGS   := -D__ASSEMBLY__
+ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
+ 		   -fno-strict-aliasing -fno-common -fshort-wchar \
+-		   -Werror-implicit-function-declaration \
++		   -Werror=implicit-function-declaration \
+ 		   -Werror=return-type -Wno-format-security \
+ 		   -std=gnu89
+ KBUILD_CPPFLAGS := -D__KERNEL__
+@@ -544,7 +544,7 @@ CLANG_FLAGS	+= -no-integrated-as
+ GCC_TOOLCHAIN_DIR := $(dir $(shell which $(CROSS_COMPILE)elfedit))
+ CLANG_FLAGS	+= --prefix=$(GCC_TOOLCHAIN_DIR)$(notdir $(CROSS_COMPILE))
+ endif
+-CLANG_FLAGS	+= -Werror=unknown-warning-option
++CLANG_FLAGS	+= -Wno-error=unknown-warning-option
+ CLANG_FLAGS	+= $(call cc-option, -Wno-unsequenced)
+ KBUILD_CPPFLAGS	+= $(CLANG_FLAGS)
+ export CLANG_FLAGS
+@@ -719,7 +719,7 @@ KBUILD_CFLAGS   += -O2
+ endif
+ 
+ ifdef CONFIG_CC_WERROR
+-KBUILD_CFLAGS  += -Werror
++KBUILD_CFLAGS  += 
+ endif
+ 
+ # Tell gcc to never replace conditional load with a non-conditional one
+@@ -989,19 +989,19 @@ KBUILD_CFLAGS  += $(call cc-option,-fno-stack-check,)
+ KBUILD_CFLAGS   += $(call cc-option,-fconserve-stack)
+ 
+ # disallow errors like 'EXPORT_GPL(foo);' with missing header
+-KBUILD_CFLAGS   += $(call cc-option,-Werror=implicit-int)
++KBUILD_CFLAGS   += $(call cc-option,=implicit-int)
+ 
+ # require functions to have arguments in prototypes, not empty 'int foo()'
+-KBUILD_CFLAGS   += $(call cc-option,-Werror=strict-prototypes)
++KBUILD_CFLAGS   += $(call cc-option,=strict-prototypes)
+ 
+ # Prohibit date/time macros, which would make the build non-deterministic
+-KBUILD_CFLAGS   += $(call cc-option,-Werror=date-time)
++KBUILD_CFLAGS   += $(call cc-option,=date-time)
+ 
+ # enforce correct pointer usage
+-KBUILD_CFLAGS   += $(call cc-option,-Werror=incompatible-pointer-types)
++KBUILD_CFLAGS   += $(call cc-option,=incompatible-pointer-types)
+ 
+ # Require designated initializers for all marked structures
+-KBUILD_CFLAGS   += $(call cc-option,-Werror=designated-init)
++KBUILD_CFLAGS   += $(call cc-option,=designated-init)
+ 
+ # Ensure compilers do not transform certain loops into calls to wcslen()
+ KBUILD_CFLAGS += -fno-builtin-wcslen
+diff --git a/arch/arm64/boot/dts/Makefile b/arch/arm64/boot/dts/Makefile
+index 8b4fa922d..bc66192ad 100644
+--- a/arch/arm64/boot/dts/Makefile
++++ b/arch/arm64/boot/dts/Makefile
+@@ -31,10 +31,10 @@ subdir-y += samsung
+ 
+ dtstree		:= $(srctree)/$(src)
+ 
+-#vendor := $(dtstree)/vendor
+-#ifneq "$(wildcard $(vendor)/Makefile)" ""
+-#        subdir-y += vendor
+-#endif
++vendor := $(dtstree)/vendor
++ifneq "$(wildcard $(vendor)/Makefile)" ""
++        subdir-y += vendor
++endif
+ 
+ dtb-$(CONFIG_OF_ALL_DTBS) := $(patsubst $(dtstree)/%.dts,%.dtb, $(foreach d,$(subdir), $(wildcard $(dtstree)/$(d)/*.dts)))
+ 
+diff --git a/arch/arm64/boot/dts/vendor/qcom/Makefile b/arch/arm64/boot/dts/vendor/qcom/Makefile
+index e355e0538..3148b1739 100644
+--- a/arch/arm64/boot/dts/vendor/qcom/Makefile
++++ b/arch/arm64/boot/dts/vendor/qcom/Makefile
+@@ -30,7 +30,10 @@ kona-arglass-overlay.dtbo-base := kona.dtb kona-v2.dtb kona-v2.1.dtb
+ kona-xrsku4-overlay.dtbo-base := kona.dtb kona-v2.dtb kona-v2.1.dtb
+ kona-hdk-overlay.dtbo-base := kona.dtb kona-v2.dtb kona-v2.1.dtb
+ else
+-dtb-$(CONFIG_ARCH_KONA) += kona-rumi.dtb \
++dtb-$(CONFIG_ARCH_KONA) += kona.dtb \
++        kona-v2.dtb \
++        kona-v2.1.dtb \
++        kona-rumi.dtb \
+         kona-mtp.dtb \
+         kona-mtp-ws.dtb \
+         kona-mtp-sa.dtb \
+@@ -63,14 +66,7 @@ dtb-$(CONFIG_ARCH_KONA) += kona-rumi.dtb \
+         kona-v2.1-xrfusion.dtb \
+         kona-v2.1-xrfusion-ult.dtb \
+         kona-v2.1-arglass.dtb \
+-        kona-v2.1-xrsku4.dtb \
+-        qrb5165-iot-rb5.dtb \
+-        qrb5165m-iot-rb5.dtb \
+-        qrb5165n-iot-rb5.dtb \
+-        qrb5165n-v2-iot-rb5.dtb \
+-        kona-v2.1-iot-rb5.dtb \
+-        kona-7230-iot-rb5.dtb \
+-        kona-7230m-iot-rb5.dtb
++        kona-v2.1-xrsku4.dtb
+ 
+ endif
+ 
+diff --git a/drivers/gps/sec_gps_bcm4753.c b/drivers/gps/sec_gps_bcm4753.c
+index 2e7f04b46..49c84e5f7 100644
+--- a/drivers/gps/sec_gps_bcm4753.c
++++ b/drivers/gps/sec_gps_bcm4753.c
+@@ -4,9 +4,8 @@
+ #include <linux/platform_device.h>
+ #include <linux/gpio.h>
+ #include <linux/of_gpio.h>
+-#if defined(CONFIG_DRV_SAMSUNG)
+ #include <linux/sec_class.h>
+-#else
++#if !defined(CONFIG_DRV_SAMSUNG)
+ extern struct class *sec_class;
+ #endif
+ 
+diff --git a/drivers/input/keyboard/hall_ic_wacom.c b/drivers/input/keyboard/hall_ic_wacom.c
+index a13324995..91e78a18c 100644
+--- a/drivers/input/keyboard/hall_ic_wacom.c
++++ b/drivers/input/keyboard/hall_ic_wacom.c
+@@ -56,12 +56,16 @@ static void wacom_cover_work(struct work_struct *work)
+ 		container_of(work, struct hall_drvdata,
+ 				wacom_cover_dwork.work);
+ 
+-	hall_wacom_status = gpio_get_value(ddata->gpio_wacom_cover);
++	/* Cover detection disabled: always report OPEN.
++	 * The back cover magnet triggers the hall sensor whenever the cover
++	 * is folded against the tablet (including during S Pen use), causing
++	 * Android to blank the screen. Stock Samsung kernel did not exhibit
++	 * this behaviour. Hardcode OPEN so Android never enters cover-sleep. */
++	hall_wacom_status = 1;
+ 
+-	pr_info("keys:%s #1 : %d\n", __func__, hall_wacom_status);
++	pr_info("keys:%s : cover detection disabled, reporting OPEN\n", __func__);
+ 
+-	input_report_switch(ddata->input,
+-			SW_MACHINE_COVER, !hall_wacom_status);
++	input_report_switch(ddata->input, SW_MACHINE_COVER, 0);
+ 	input_sync(ddata->input);
+ }
+ 
+@@ -117,7 +121,12 @@ static void init_hall_ic_wacom_irq(struct hall_drvdata *ddata)
+ 	int ret = 0;
+ 	int irq = ddata->irq_wacom_cover;
+ 
+-	hall_wacom_status = gpio_get_value(ddata->gpio_wacom_cover);
++	/* Do not read GPIO at init: Samsung Android reads hall_wacom_detect sysfs
++	 * early (t~46s) before coverType=0 is established (t~49s). Reading GPIO
++	 * here with S Pen in slot gives hall_wacom_status=0 (CLOSE), which
++	 * triggers a spurious cover_close sleep. Keep initial value=1 (OPEN)
++	 * so Android sees OPEN until wacom_hall_open fires (500ms after Android
++	 * opens the device, when coverType=0 is already known). */
+ 
+ 	INIT_DELAYED_WORK(&ddata->wacom_cover_dwork, wacom_cover_work);
+ 
+diff --git a/drivers/input/sec_cmd.c b/drivers/input/sec_cmd.c
+index 37b4a48d4..19095902a 100644
+--- a/drivers/input/sec_cmd.c
++++ b/drivers/input/sec_cmd.c
+@@ -10,6 +10,7 @@
+  */
+ 
+ #include <linux/input/sec_cmd.h>
++#include <linux/input/sec_tsp_log.h>
+ 
+ struct class *tsp_sec_class;
+ 
+diff --git a/drivers/input/touchscreen/synaptics_dsx/synaptics_dsx_rmi_dev.c b/drivers/input/touchscreen/synaptics_dsx/synaptics_dsx_rmi_dev.c
+index 8243e9802..8f506971b 100755
+--- a/drivers/input/touchscreen/synaptics_dsx/synaptics_dsx_rmi_dev.c
++++ b/drivers/input/touchscreen/synaptics_dsx/synaptics_dsx_rmi_dev.c
+@@ -40,6 +40,7 @@
+ #include <linux/input.h>
+ #include <linux/signal.h>
+ #include <linux/sched.h>
++#include <linux/sched/signal.h>
+ #include <linux/gpio.h>
+ #include <linux/uaccess.h>
+ #include <linux/cdev.h>
+diff --git a/drivers/pinctrl/qcom/pinctrl-msm.c b/drivers/pinctrl/qcom/pinctrl-msm.c
+index 31ed30330..59f4507ee 100644
+--- a/drivers/pinctrl/qcom/pinctrl-msm.c
++++ b/drivers/pinctrl/qcom/pinctrl-msm.c
+@@ -27,6 +27,7 @@
+ #include <linux/slab.h>
+ #include <linux/gpio.h>
+ #include <linux/interrupt.h>
++#include <linux/sec-pinmux.h>
+ #include <linux/spinlock.h>
+ #include <linux/syscore_ops.h>
+ #include <linux/soc/qcom/irq.h>
+diff --git a/include/linux/msm_pcie.h b/include/linux/msm_pcie.h
+index 01ba7c682..a768cabfe 100644
+--- a/include/linux/msm_pcie.h
++++ b/include/linux/msm_pcie.h
+@@ -332,6 +332,14 @@ int sec_pcie_l1ss_enable(int ctrl_id);
+ int sec_pcie_l1ss_disable(int ctrl_id);
+ #else
+ 
++/* Stub enum so code using L1SS_AUDIO compiles when CONFIG_SEC_PCIE_L1SS is off */
++enum l1ss_ctrl_ids {
++	L1SS_SYSFS,
++	L1SS_MST,
++	L1SS_AUDIO,
++	L1SS_MAX
++};
++
+ #define sec_pcie_set_use_ep_loaded(dev) do { } while(0)
+ #define sec_pcie_set_ep_driver_loaded(dev, is_loaded) do { } while(0)
+ 
+diff --git a/kernel/locking/lockdep.c b/kernel/locking/lockdep.c
+index f5c7813a9..3e73a4785 100644
+--- a/kernel/locking/lockdep.c
++++ b/kernel/locking/lockdep.c
+@@ -4005,7 +4005,7 @@ void lock_release(struct lockdep_map *lock, unsigned long ip)
+ 	check_flags(flags);
+ 	current->lockdep_recursion = 1;
+ 	trace_lock_release(lock, ip);
+-	if (__lock_release(lock, nested, ip))
++	if (__lock_release(lock, 0, ip))
+ 		check_chain_key(current);
+ 	current->lockdep_recursion = 0;
+ 	raw_local_irq_restore(flags);
+diff --git a/kernel/rcu/update.c b/kernel/rcu/update.c
+index 153ade060..985448200 100644
+--- a/kernel/rcu/update.c
++++ b/kernel/rcu/update.c
+@@ -264,6 +264,13 @@ struct lockdep_map rcu_callback_map =
+ 	STATIC_LOCKDEP_MAP_INIT("rcu_callback", &rcu_callback_key);
+ EXPORT_SYMBOL_GPL(rcu_callback_map);
+ 
++#ifdef CONFIG_TASKS_TRACE_RCU
++static struct lock_class_key rcu_trace_lock_key;
++struct lockdep_map rcu_trace_lock_map =
++	STATIC_LOCKDEP_MAP_INIT("rcu_read_lock_trace", &rcu_trace_lock_key);
++EXPORT_SYMBOL_GPL(rcu_trace_lock_map);
++#endif /* #ifdef CONFIG_TASKS_TRACE_RCU */
++
+ int notrace debug_lockdep_rcu_enabled(void)
+ {
+ 	return rcu_scheduler_active != RCU_SCHEDULER_INACTIVE && debug_locks &&
+diff --git a/lib/fault-inject.c b/lib/fault-inject.c
+index cf7b129b0..bf17f6b66 100644
+--- a/lib/fault-inject.c
++++ b/lib/fault-inject.c
+@@ -111,7 +111,8 @@ bool should_fail(struct fault_attr *attr, ssize_t size)
+ 		unsigned int fail_nth = READ_ONCE(current->fail_nth);
+ 
+ 		if (fail_nth) {
+-			if (!WRITE_ONCE(current->fail_nth, fail_nth - 1))
++			WRITE_ONCE(current->fail_nth, fail_nth - 1);
++			if (fail_nth == 1)
+ 				goto fail;
+ 
+ 			return false;
+diff --git a/techpack/display/msm/sde/sde_encoder_phys_wb.c b/techpack/display/msm/sde/sde_encoder_phys_wb.c
+index 5c8de3dd6..f14316870 100644
+--- a/techpack/display/msm/sde/sde_encoder_phys_wb.c
++++ b/techpack/display/msm/sde/sde_encoder_phys_wb.c
+@@ -1247,7 +1247,9 @@ static void _sde_encoder_phys_wb_reset_state(
+ 	flag_boost_mdpclk_cwb = false;
+ 	if (wb_enc->base.parent->dev) {
+ 		SDE_INFO("restore normal sde core clk\n");
++#if defined(CONFIG_DISPLAY_SAMSUNG)
+ 		ss_set_normal_sde_core_clk(wb_enc->base.parent->dev);
++#endif
+ 	}
+ }
+ 
+@@ -1594,7 +1596,9 @@ static void sde_encoder_phys_wb_enable(struct sde_encoder_phys *phys_enc)
+ 
+ 	SDE_INFO("WB Enable, boost up sde core clk\n");
+ 	flag_boost_mdpclk_cwb = true;
++#if defined(CONFIG_DISPLAY_SAMSUNG)
+ 	ss_set_max_sde_core_clk(dev);
++#endif
+ 
+ 	/* find associated writeback connector */
+ 	connector = phys_enc->connector;
+diff --git a/techpack/display/msm/sde/sde_kms.c b/techpack/display/msm/sde/sde_kms.c
+index ccf23d292..1d9f29c77 100644
+--- a/techpack/display/msm/sde/sde_kms.c
++++ b/techpack/display/msm/sde/sde_kms.c
+@@ -303,9 +303,7 @@ static int sde_kms_enable_vblank(struct msm_kms *kms, struct drm_crtc *crtc)
+ 
+ static void sde_kms_disable_vblank(struct msm_kms *kms, struct drm_crtc *crtc)
+ {
+-#if defined(CONFIG_DISPLAY_SAMSUNG) // case 04436106
+ 	int ret = 0;
+-#endif
+ 
+ 	SDE_ATRACE_BEGIN("sde_kms_disable_vblank");
+ 	ret = sde_crtc_vblank(crtc, false);

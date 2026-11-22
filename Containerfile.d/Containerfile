@@ -1,0 +1,41 @@
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Ubuntu 22.04 (Jammy) inclut clang-12 dans ses repos officiels
+RUN apt-get update && apt-get install -y \
+    bc \
+    bison \
+    build-essential \
+    flex \
+    git \
+    libelf-dev \
+    libncurses5-dev \
+    libssl-dev \
+    python3 \
+    zip \
+    binutils-aarch64-linux-gnu \
+    clang-12 \
+    lld-12 \
+    llvm-12 \
+    dwarves \
+    lz4 \
+    && rm -rf /var/lib/apt/lists/*
+
+# /usr/lib/llvm-12/bin contient tous les outils LLVM sans suffixe de version :
+# clang, clang++, ld.lld, llvm-ar, llvm-nm, llvm-objcopy, llvm-objdump, etc.
+# Le Makefile kernel avec LLVM=1 les attend exactement sous ces noms.
+ENV PATH="/usr/lib/llvm-12/bin:${PATH}"
+
+# Boot image tools (mkbootimg, unpack_bootimg, avbtool) from AOSP, pinned.
+# Distro packages are too old on Debian 12 / Ubuntu 22.04 (no unpack_bootimg
+# --format) and avbtool is not packaged there: the scripts fall back to these.
+ARG AOSP_TAG=android-14.0.0_r75
+RUN git clone -q --depth 1 --branch ${AOSP_TAG} https://android.googlesource.com/platform/system/tools/mkbootimg /opt/aosp/mkbootimg \
+ && git clone -q --depth 1 --branch ${AOSP_TAG} https://android.googlesource.com/platform/external/avb /opt/aosp/avb \
+ && printf '#!/bin/sh\nexec python3 /opt/aosp/mkbootimg/mkbootimg.py "$@"\n'      > /usr/local/bin/mkbootimg \
+ && printf '#!/bin/sh\nexec python3 /opt/aosp/mkbootimg/unpack_bootimg.py "$@"\n' > /usr/local/bin/unpack_bootimg \
+ && printf '#!/bin/sh\nexec python3 /opt/aosp/avb/avbtool.py "$@"\n'             > /usr/local/bin/avbtool \
+ && chmod 755 /usr/local/bin/mkbootimg /usr/local/bin/unpack_bootimg /usr/local/bin/avbtool
+
+WORKDIR /work

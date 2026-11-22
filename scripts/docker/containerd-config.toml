@@ -1,0 +1,28 @@
+version = 2
+root = "/data/docker/containerd-root"
+state = "/data/docker/containerd-state"
+
+[grpc]
+  address = "/data/docker/containerd.sock"
+
+[ttrpc]
+  address = "/data/docker/containerd-ttrpc.sock"
+
+[debug]
+  address = "/data/docker/containerd-debug.sock"
+  level = "info"
+
+[plugins."io.containerd.grpc.v1.cri"]
+  disable_tcp_service = true
+
+[plugins."io.containerd.grpc.v1.cri".containerd]
+  snapshotter = "overlayfs"
+
+[plugins."io.containerd.runtime.v2.task"]
+  platforms = ["linux/arm64"]
+
+[plugins."io.containerd.service.v1.tasks-service"]
+  rdt_config_file = ""
+
+[plugins."io.containerd.internal.v1.opt"]
+  path = "/data/docker/containerd-opt"

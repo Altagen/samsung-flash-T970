@@ -1,0 +1,16 @@
+# Third-party binaries you download (TWRP, Magisk, firmware, runtimes)
+downloads/
+
+# Samsung kernel sources and build artifacts
+sources/
+output/
+
+# Any image or firmware file: nothing binary is versioned, everything is built or downloaded
+*.img
+*.tar.md5
+*.lz4
+
+# OS / editor
+.DS_Store
+*.swp
+*~
